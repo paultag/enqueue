@@ -23,6 +23,7 @@ func Watch(watcher *inotify.Watcher, file os.FileInfo) error {
 	if _, err := os.Stat(incoming); os.IsNotExist(err) {
 		return err
 	}
+	/* Sweep existing files in there */
 
 	if err := watcher.Watch(incoming); err != nil {
 		return err
