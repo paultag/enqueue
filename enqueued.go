@@ -56,7 +56,7 @@ func Process(changesPath string) {
 	// if err := repo.Export(); err != nil {
 	// 	log.Printf("%s\n", err)
 	// }
-	log.Printf("%s", repo)
+	log.Printf("Included %s into %s", changes.Source, repo.Basedir)
 	// log.Printf("%s %s", changesPath, repoRoot)
 }
 
