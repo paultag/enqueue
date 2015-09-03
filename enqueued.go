@@ -59,6 +59,7 @@ func Process(changesPath string) {
 	// }
 	log.Printf("Included %s into %s", changes.Source, repo.Basedir)
 	// log.Printf("%s %s", changesPath, repoRoot)
+	changes.Remove()
 }
 
 func main() {
