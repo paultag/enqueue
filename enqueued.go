@@ -1,13 +1,16 @@
 package main
 
 import (
+	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
 	"path"
+	"strings"
 
 	"golang.org/x/exp/inotify"
-	// "pault.ag/go/reprepro"
+	"pault.ag/go/debian/control"
+	"pault.ag/go/reprepro"
 )
 
 func Watch(watcher *inotify.Watcher, file os.FileInfo) error {
@@ -30,10 +33,31 @@ func Watch(watcher *inotify.Watcher, file os.FileInfo) error {
 
 func Process(changesPath string) {
 	repoRoot := path.Clean(path.Join(path.Dir(changesPath), ".."))
-	// repo := reprepro.NewRepo(repoRoot)
-	// repo.Include()
-	// log.Printf("%s", repo)
-	log.Printf("%s", repoRoot)
+	pwd, err := os.Getwd()
+	if err != nil {
+		log.Printf("%s\n", err)
+		return
+	}
+	gnuPGHome := path.Join(pwd, "..", "private", repoRoot, ".gnupg")
+	repo := reprepro.NewRepo(repoRoot, fmt.Sprintf("--gnupghome=%s", gnuPGHome))
+
+	changes, err := control.ParseChangesFile(changesPath)
+	if err != nil {
+		log.Printf("Error: %s\n", err)
+	}
+
+	err = repo.Include(changes.Distribution, changesPath)
+	if err != nil {
+		log.Printf("Error: %s\n", err)
+		changes.Remove()
+		log.Printf("Removed %s and associated files\n", changesPath)
+	}
+
+	// if err := repo.Export(); err != nil {
+	// 	log.Printf("%s\n", err)
+	// }
+	log.Printf("%s", repo)
+	// log.Printf("%s %s", changesPath, repoRoot)
 }
 
 func main() {
@@ -56,7 +80,8 @@ func main() {
 	for {
 		select {
 		case ev := <-watcher.Event:
-			if ev.Mask^inotify.IN_CLOSE_WRITE != 0 {
+			if ev.Mask^inotify.IN_CLOSE_WRITE != 0 ||
+				!strings.HasSuffix(ev.Name, ".changes") {
 				continue
 			}
 			go Process(ev.Name)
