@@ -11,13 +11,19 @@ import (
 	"golang.org/x/exp/inotify"
 	"pault.ag/go/config"
 	"pault.ag/go/debian/control"
-	// "pault.ag/go/mailer"
+	"pault.ag/go/mailer"
 	"pault.ag/go/reprepro"
 )
 
+var Mailer *mailer.Mailer
+var conf = Enqueued{
+	Root: ".",
+}
+
 type Enqueued struct {
-	Root      string `flag:"root" description:"Repo root to watch"`
-	Templates string `flag:"templates" description:"Mail templates"`
+	Root          string `flag:"root" description:"Repo root to watch"`
+	Templates     string `flag:"templates" description:"Mail templates"`
+	Administrator string `flag:"admin" description:"Admin address"`
 }
 
 func Watch(watcher *inotify.Watcher, file os.FileInfo) error {
@@ -37,6 +43,13 @@ func Watch(watcher *inotify.Watcher, file os.FileInfo) error {
 	}
 
 	return nil
+}
+
+type Upload struct {
+	Changes control.Changes
+	Repo    reprepro.Repo
+	From    string
+	To      string
 }
 
 func Process(changesPath string) {
@@ -66,19 +79,35 @@ func Process(changesPath string) {
 	// }
 	log.Printf("Included %s into %s", changes.Source, repo.Basedir)
 	// log.Printf("%s %s", changesPath, repoRoot)
+	if err := Mailer.Mail(
+		[]string{conf.Administrator},
+		"accepted",
+		&Upload{
+			Changes: *changes,
+			Repo:    *repo,
+			From:    Mailer.Config.Sender,
+			To:      conf.Administrator,
+		},
+	); err != nil {
+		log.Printf("Error: %s", err)
+	}
 	changes.Remove()
 }
 
 func main() {
-	conf := Enqueued{
-		Root: ".",
-	}
-
 	flags, err := config.LoadFlags("enqueued", &conf)
 	if err != nil {
 		log.Fatal(err)
 	}
 	flags.Parse(os.Args[1:])
+	os.Chdir(conf.Root)
+
+	if conf.Templates != "" {
+		Mailer, err = mailer.NewMailer(conf.Templates)
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
 
 	files, err := ioutil.ReadDir(conf.Root)
 	if err != nil {
@@ -103,7 +132,7 @@ func main() {
 				!strings.HasSuffix(ev.Name, ".changes") {
 				continue
 			}
-			go Process(ev.Name)
+			Process(ev.Name)
 		}
 	}
 }

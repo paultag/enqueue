@@ -1,0 +1,13 @@
+Subject: {{.Changes.Source}}/{{.Changes.Version}} accepted into {{.Repo.Basedir}}/{{.Changes.Distribution}}
+From: Enqueued <{{.From}}>
+To:   {{.To}}
+
+
+{{.Changes.Source}}/{{.Changes.Version}} has been accepted into
+{{.Repo.Basedir}}/{{.Changes.Distribution}} by {{.Changes.ChangedBy}}
+
+Files:
+{{range .Changes.Files}}
+   {{.Filename}}{{end}}
+
+{{.Changes.Changes}}
