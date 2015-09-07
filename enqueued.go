@@ -74,11 +74,8 @@ func Process(changesPath string) {
 		log.Printf("Removed %s and associated files\n", changesPath)
 	}
 
-	// if err := repo.Export(); err != nil {
-	// 	log.Printf("%s\n", err)
-	// }
 	log.Printf("Included %s into %s", changes.Source, repo.Basedir)
-	// log.Printf("%s %s", changesPath, repoRoot)
+
 	if err := Mailer.Mail(
 		[]string{conf.Administrator},
 		"accepted",
