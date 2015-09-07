@@ -72,6 +72,7 @@ func Process(changesPath string) {
 		log.Printf("Error: %s\n", err)
 		changes.Remove()
 		log.Printf("Removed %s and associated files\n", changesPath)
+		return
 	}
 
 	log.Printf("Included %s into %s", changes.Source, repo.Basedir)
