@@ -9,9 +9,16 @@ import (
 	"strings"
 
 	"golang.org/x/exp/inotify"
+	"pault.ag/go/config"
 	"pault.ag/go/debian/control"
+	// "pault.ag/go/mailer"
 	"pault.ag/go/reprepro"
 )
+
+type Enqueued struct {
+	Root      string `flag:"root" description:"Repo root to watch"`
+	Templates string `flag:"templates" description:"Mail templates"`
+}
 
 func Watch(watcher *inotify.Watcher, file os.FileInfo) error {
 	if !file.IsDir() {
@@ -63,7 +70,17 @@ func Process(changesPath string) {
 }
 
 func main() {
-	files, err := ioutil.ReadDir(".")
+	conf := Enqueued{
+		Root: ".",
+	}
+
+	flags, err := config.LoadFlags("enqueued", &conf)
+	if err != nil {
+		log.Fatal(err)
+	}
+	flags.Parse(os.Args[1:])
+
+	files, err := ioutil.ReadDir(conf.Root)
 	if err != nil {
 		log.Fatal(err)
 	}
