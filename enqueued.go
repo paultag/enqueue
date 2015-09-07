@@ -76,17 +76,19 @@ func Process(changesPath string) {
 
 	log.Printf("Included %s into %s", changes.Source, repo.Basedir)
 
-	if err := Mailer.Mail(
-		[]string{conf.Administrator},
-		"accepted",
-		&Upload{
-			Changes: *changes,
-			Repo:    *repo,
-			From:    Mailer.Config.Sender,
-			To:      conf.Administrator,
-		},
-	); err != nil {
-		log.Printf("Error: %s", err)
+	if Mailer != nil {
+		if err := Mailer.Mail(
+			[]string{conf.Administrator},
+			"accepted",
+			&Upload{
+				Changes: *changes,
+				Repo:    *repo,
+				From:    Mailer.Config.Sender,
+				To:      conf.Administrator,
+			},
+		); err != nil {
+			log.Printf("Error: %s", err)
+		}
 	}
 	changes.Remove()
 }
