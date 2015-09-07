@@ -50,6 +50,7 @@ type Upload struct {
 	Repo    reprepro.Repo
 	From    string
 	To      string
+	Reason  string
 }
 
 func Process(changesPath string) {
@@ -69,6 +70,22 @@ func Process(changesPath string) {
 
 	err = repo.Include(changes.Distribution, changesPath)
 	if err != nil {
+
+		if Mailer != nil {
+			if err := Mailer.Mail(
+				[]string{conf.Administrator},
+				"rejected",
+				&Upload{
+					Changes: *changes,
+					Repo:    *repo,
+					From:    Mailer.Config.Sender,
+					To:      conf.Administrator,
+					Reason:  err.Error(),
+				},
+			); err != nil {
+				log.Printf("Error: %s", err)
+			}
+		}
 		log.Printf("Error: %s\n", err)
 		changes.Remove()
 		log.Printf("Removed %s and associated files\n", changesPath)
