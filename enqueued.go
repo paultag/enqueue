@@ -15,7 +15,8 @@ import (
 	"pault.ag/go/reprepro"
 )
 
-var Mailer *mailer.Mailer
+var enqueuedMailer *mailer.Mailer
+
 var conf = Enqueued{
 	Root: ".",
 }
@@ -51,6 +52,14 @@ type Upload struct {
 	Reason  string
 }
 
+func Mail(to []string, template string, data interface{}) {
+	if enqueuedMailer != nil {
+		if err := enqueuedMailer.Mail(to, template, data); err != nil {
+			log.Printf("Error: %s", err)
+		}
+	}
+}
+
 func Process(changesPath string) {
 	repoRoot := path.Clean(path.Join(path.Dir(changesPath), ".."))
 	pwd, err := os.Getwd()
@@ -68,20 +77,12 @@ func Process(changesPath string) {
 
 	err = repo.Include(changes.Distribution, changesPath)
 	if err != nil {
+		go Mail([]string{conf.Administrator}, "rejected", &Upload{
+			Changes: *changes,
+			Repo:    *repo,
+			Reason:  err.Error(),
+		})
 
-		if Mailer != nil {
-			if err := Mailer.Mail(
-				[]string{conf.Administrator},
-				"rejected",
-				&Upload{
-					Changes: *changes,
-					Repo:    *repo,
-					Reason:  err.Error(),
-				},
-			); err != nil {
-				log.Printf("Error: %s", err)
-			}
-		}
 		log.Printf("Error: %s\n", err)
 		changes.Remove()
 		log.Printf("Removed %s and associated files\n", changesPath)
@@ -89,19 +90,10 @@ func Process(changesPath string) {
 	}
 
 	log.Printf("Included %s into %s", changes.Source, repo.Basedir)
-
-	if Mailer != nil {
-		if err := Mailer.Mail(
-			[]string{conf.Administrator},
-			"accepted",
-			&Upload{
-				Changes: *changes,
-				Repo:    *repo,
-			},
-		); err != nil {
-			log.Printf("Error: %s", err)
-		}
-	}
+	go Mail([]string{conf.Administrator}, "accepted", &Upload{
+		Changes: *changes,
+		Repo:    *repo,
+	})
 	changes.Remove()
 }
 
@@ -114,7 +106,7 @@ func main() {
 	os.Chdir(conf.Root)
 
 	if conf.Templates != "" {
-		Mailer, err = mailer.NewMailer(conf.Templates)
+		enqueuedMailer, err = mailer.NewMailer(conf.Templates)
 		if err != nil {
 			log.Fatal(err)
 		}
