@@ -1,7 +1,11 @@
 Subject: REJECTED {{.Data.Changes.Source}}/{{.Data.Changes.Version}} from {{.Data.Repo.Basedir}}/{{.Data.Changes.Distribution}}
 From: Enqueued <{{.From}}>
 To:   {{.To}}
-
+X-Debian: enqueued
+X-Debian-Package: {{.Data.Changes.Source}}
+X-Debian-Package-Version: {{.Data.Changes.Version}}
+Precedence: bulk
+Auto-Submitted: auto-generated
 
 {{.Data.Changes.Source}}/{{.Data.Changes.Version}} has been rejected from
 {{.Data.Repo.Basedir}}/{{.Data.Changes.Distribution}}.

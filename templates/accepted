@@ -1,7 +1,11 @@
 Subject: {{.Data.Changes.Source}}/{{.Data.Changes.Version}} accepted into {{.Data.Repo.Basedir}}/{{.Data.Changes.Distribution}}
 From: Enqueued <{{.From}}>
 To:   {{.To}}
-
+X-Debian: enqueued
+X-Debian-Package: {{.Data.Changes.Source}}
+X-Debian-Package-Version: {{.Data.Changes.Version}}
+Precedence: bulk
+Auto-Submitted: auto-generated
 
 {{.Data.Changes.Source}}/{{.Data.Changes.Version}} has been accepted into
 {{.Data.Repo.Basedir}}/{{.Data.Changes.Distribution}} by {{.Data.Changes.ChangedBy}}
