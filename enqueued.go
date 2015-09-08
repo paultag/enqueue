@@ -48,8 +48,6 @@ func Watch(watcher *inotify.Watcher, file os.FileInfo) error {
 type Upload struct {
 	Changes control.Changes
 	Repo    reprepro.Repo
-	From    string
-	To      string
 	Reason  string
 }
 
@@ -78,8 +76,6 @@ func Process(changesPath string) {
 				&Upload{
 					Changes: *changes,
 					Repo:    *repo,
-					From:    Mailer.Config.Sender,
-					To:      conf.Administrator,
 					Reason:  err.Error(),
 				},
 			); err != nil {
@@ -101,8 +97,6 @@ func Process(changesPath string) {
 			&Upload{
 				Changes: *changes,
 				Repo:    *repo,
-				From:    Mailer.Config.Sender,
-				To:      conf.Administrator,
 			},
 		); err != nil {
 			log.Printf("Error: %s", err)

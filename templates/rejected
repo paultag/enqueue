@@ -1,11 +1,11 @@
-Subject: {{.Changes.Source}}/{{.Changes.Version}} rejected from {{.Repo.Basedir}}/{{.Changes.Distribution}}
+Subject: REJECTED {{.Data.Changes.Source}}/{{.Data.Changes.Version}} from {{.Data.Repo.Basedir}}/{{.Data.Changes.Distribution}}
 From: Enqueued <{{.From}}>
 To:   {{.To}}
 
 
-{{.Changes.Source}}/{{.Changes.Version}} has been rejected from
-{{.Repo.Basedir}}/{{.Changes.Distribution}}.
+{{.Data.Changes.Source}}/{{.Data.Changes.Version}} has been rejected from
+{{.Data.Repo.Basedir}}/{{.Data.Changes.Distribution}}.
 
-Nice work, {{.Changes.ChangedBy}}.
+Nice work, {{.Data.Changes.ChangedBy}}.
 
-{{.Reason}}
+{{.Data.Reason}}
