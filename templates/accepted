@@ -1,4 +1,4 @@
-Subject: ACCEPTED {{.Data.Changes.Source}}/{{.Data.Changes.Version}} into {{.Data.Repo.Basedir}}/{{.Data.Changes.Distribution}}
+Subject: ACCEPTED {{range .Data.Changes.Architectures}}{{.}} {{end}}{{.Data.Changes.Source}}/{{.Data.Changes.Version}} into {{.Data.Repo.Basedir}}/{{.Data.Changes.Distribution}}
 From: Enqueued <{{.From}}>
 To:   {{.To}}
 X-Debian: enqueued

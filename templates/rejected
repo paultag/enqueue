@@ -1,4 +1,4 @@
-Subject: REJECTED {{.Data.Changes.Source}}/{{.Data.Changes.Version}} from {{.Data.Repo.Basedir}}/{{.Data.Changes.Distribution}}
+Subject: REJECTED {{range .Data.Changes.Architectures}}{{.}} {{end}}{{.Data.Changes.Source}}/{{.Data.Changes.Version}} from {{.Data.Repo.Basedir}}/{{.Data.Changes.Distribution}}
 From: Enqueued <{{.From}}>
 To:   {{.To}}
 X-Debian: enqueued
