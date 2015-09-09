@@ -68,7 +68,11 @@ func Process(changesPath string) {
 		return
 	}
 	gnuPGHome := path.Join(pwd, "..", "private", repoRoot, ".gnupg")
-	repo := reprepro.NewRepo(repoRoot, fmt.Sprintf("--gnupghome=%s", gnuPGHome))
+	repo := reprepro.NewRepo(
+		repoRoot,
+		"--component=main",
+		fmt.Sprintf("--gnupghome=%s", gnuPGHome),
+	)
 
 	changes, err := control.ParseChangesFile(changesPath)
 	if err != nil {
